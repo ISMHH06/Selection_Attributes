@@ -1,0 +1,474 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP2 - Sélection d'Attributs (Filter & Wrapper)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+
+    <style>
+        :root { --bg-body: #0f1117; --bg-card: #1a1d27; --primary: #7c3aed; --success: #00c896; --text-light: #e2e8f0; --text-muted: #94a3b8; --border: #2d3748; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-light); line-height: 1.6; overflow-x: hidden; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        header { text-align: center; margin-bottom: 2rem; animation: fadeIn 1s ease-out; }
+        h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(to right, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.2rem; color: var(--text-muted); font-weight: 400; margin-bottom: 1.5rem; }
+        .badge { display: inline-block; background: rgba(124, 58, 237, 0.2); color: #c4b5fd; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--primary); box-shadow: 0 0 10px rgba(124, 58, 237, 0.3); }
+        .mini-badges { display: flex; justify-content: center; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+        .mini-badge { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.8rem; color: var(--text-muted); }
+        .progress-container { width: 100%; height: 6px; background-color: var(--bg-card); border-radius: 3px; margin: 2rem 0; overflow: hidden; position: relative; }
+        .progress-bar { height: 100%; background-color: var(--primary); width: 20%; transition: width 0.4s ease; }
+        .progress-text { text-align: right; font-size: 0.8rem; color: var(--text-muted); margin-top: -1.5rem; margin-bottom: 2rem; font-weight: 600; }
+        nav.tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .tab-btn { background-color: transparent; color: var(--text-muted); border: none; padding: 0.75rem 1.25rem; font-size: 0.95rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; }
+        .tab-btn:hover { color: var(--text-light); background-color: rgba(255, 255, 255, 0.05); }
+        .tab-btn.active { background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); }
+        .phase-content { display: none; background-color: var(--bg-card); border-radius: 12px; padding: 2rem; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .phase-content.active { display: block; animation: slideUp 0.5s ease forwards; }
+        .phase-title { font-size: 1.5rem; color: var(--text-light); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+        .phase-title span.number { background: var(--primary); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 1rem; font-weight: bold; }
+        p.explanation { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1rem; }
+        .alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .alert-warning { background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; color: var(--text-light); }
+        .alert-info { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; color: var(--text-light); }
+        .alert-info code { font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 4px; }
+        .alert-error { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; color: #fca5a5; display: none; }
+        pre { background: #0d0f15 !important; border-radius: 8px; padding: 1.25rem !important; margin-bottom: 1.5rem; border: 1px solid #1e2532; overflow-x: auto; }
+        code { font-family: 'JetBrains Mono', monospace !important; font-size: 0.9rem; }
+        .result-box { background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border); border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem; display: none; }
+        .result-box.visible { display: block; }
+        .result-box h3 { font-size: 1rem; margin-bottom: 1rem; color: #cbd5e1; }
+        .metric-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .metric { background: var(--bg-body); padding: 1rem; border-radius: 8px; border-left: 3px solid var(--success); flex: 1; min-width: 150px; }
+        .metric.purple { border-left-color: var(--primary); }
+        .metric-value { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .metric-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .heatmap-container { display: flex; justify-content: center; margin-top: 1rem; }
+        .heatmap-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: var(--bg-body); padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
+        .cell { width: 30px; height: 30px; border-radius: 4px; transition: transform 0.2s; position: relative; cursor: pointer; }
+        .cell:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.2); z-index: 10; }
+        .cell::after { content: attr(data-score); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; }
+        .cell:hover::after { opacity: 1; }
+        .chart-bar-container { display: flex; flex-direction: column; gap: 1rem; }
+        .chart-row { display: flex; align-items: center; gap: 1rem; }
+        .chart-label { width: 150px; font-size: 0.9rem; font-weight: 600; }
+        .chart-bar-out { flex: 1; background: var(--bg-body); height: 24px; border-radius: 12px; overflow: hidden; position: relative; }
+        .chart-bar-in { height: 100%; background: var(--primary); border-radius: 12px; display: flex; align-items: center; padding-right: 10px; justify-content: flex-end; color: white; font-size: 0.8rem; font-weight: bold; font-family: 'JetBrains Mono', monospace; width: 0; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .chart-bar-in.success { background: var(--success); }
+        .feature-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.25rem 0.75rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #a78bfa; }
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: rgba(0, 0, 0, 0.2); border-radius: 8px; overflow: hidden; font-size: 0.9rem; }
+        .summary-table th { background: rgba(124, 58, 237, 0.15); color: #c4b5fd; padding: 1rem; text-align: center; border-bottom: 1px solid var(--border); }
+        .summary-table td { padding: 1rem; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-family: 'JetBrains Mono', monospace; }
+        .summary-table tr:last-child td { border-bottom: none; }
+        .summary-table tr.best-result { background: rgba(0, 200, 150, 0.05); border-left: 4px solid var(--success); }
+        .badge-best { background: rgba(0, 200, 150, 0.2); color: var(--success); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: bold; font-family: 'Inter', sans-serif; text-transform: uppercase; }
+        footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .btn-run { background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s; }
+        .btn-run:hover { background: var(--primary-hover); }
+        .btn-run:disabled { opacity: 0.7; cursor: not-allowed; }
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 16px; height: 16px; animation: spin 1s linear infinite; display: none; }
+        .loading-text { display: none; margin-left: 10px; font-size: 0.9rem; color: var(--text-muted); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        @media (max-width: 600px) { .tab-btn { flex: 1 1 100%; text-align: center; } .chart-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; } .chart-label { width: 100%; } .cell { width: 25px; height: 25px; } .summary-table { font-size: 0.8rem; } .summary-table td, .summary-table th { padding: 0.5rem; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>TP2 – Sélection d'Attributs</h1>
+        <h2>Filter & Wrapper Methods | Dataset : Digits</h2>
+        <div class="badge">Objectif : 64 → 10 features</div>
+        <div class="mini-badges">
+            <div class="mini-badge">1797 échantillons</div>
+            <div class="mini-badge">10 classes</div>
+            <div class="mini-badge">64 → 10 features ↓84%</div>
+        </div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">Phase 1 / 5</div>
+
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="showPhase(1)">1. Données</button>
+        <button class="tab-btn" onclick="showPhase(2)">2. Filter (ANOVA)</button>
+        <button class="tab-btn" onclick="showPhase(3)">3. Forward</button>
+        <button class="tab-btn" onclick="showPhase(4)">4. Backward</button>
+        <button class="tab-btn" onclick="showPhase(5)">5. Comparaison</button>
+    </nav>
+
+    <!-- PHASE 1 -->
+    <div id="phase1" class="phase-content active">
+        <h2 class="phase-title"><span class="number">1</span>Préparation des données</h2>
+        <p class="explanation">Importation des bibliothèques, chargement du dataset "Digits" (images 8x8 de chiffres manuscrits) et séparation en ensembles d'apprentissage (70%) et de test (30%).</p>
+        
+<pre><code class="language-python">import numpy as np
+import pandas as pd
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+
+digits = load_digits()
+X, y = digits.data, digits.target
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, stratify=y, random_state=42
+)</code></pre>
+
+        <button class="btn-run" onclick="runPhase(1)" id="btn1">
+            ▶ Lancer la préparation
+            <div class="spinner" id="spin1"></div>
+        </button>
+        <span class="loading-text" id="load1">Chargement des données...</span>
+        
+        <div class="alert alert-error" id="err1">Erreur de connexion au serveur API.</div>
+
+        <div class="result-box" id="res1">
+            <h3>Diagnostic de l'environnement</h3>
+            <div class="metric-group">
+                <div class="metric">
+                    <div class="metric-value" id="val_samples">-</div>
+                    <div class="metric-label">Échantillons totaux</div>
+                </div>
+                <div class="metric purple">
+                    <div class="metric-value" id="val_features">-</div>
+                    <div class="metric-label">Features (Pixels 8x8)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="val_train">-</div>
+                    <div class="metric-label">Shape X_train</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div id="phase2" class="phase-content">
+        <h2 class="phase-title"><span class="number">2</span>Approche Filter (ANOVA F-value)</h2>
+        <p class="explanation">Sélection des 10 meilleurs attributs indépendamment du modèle, en utilisant le test statistique ANOVA. Les pixels ayant le plus de variance inter-classe sont privilégiés.</p>
+        
+<pre><code class="language-python">from sklearn.feature_selection import SelectKBest, f_classif
+
+selector_filter = SelectKBest(score_func=f_classif, k=10)
+selector_filter.fit(X_train, y_train)
+
+filter_mask = selector_filter.get_support()
+f_scores = selector_filter.scores_
+selected_features_filter = np.where(filter_mask)[0]</code></pre>
+
+        <button class="btn-run" onclick="runPhase(2)" id="btn2">
+            ▶ Lancer le calcul ANOVA
+            <div class="spinner" id="spin2"></div>
+        </button>
+        <span class="loading-text" id="load2">Calcul des scores en cours...</span>
+        
+        <div class="alert alert-error" id="err2">Erreur API.</div>
+
+        <div class="result-box" id="res2">
+            <h3>Visualisation : Heatmap des scores F réels</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 1rem;">Pixels incandescents = haute valeur F (plus discriminants)</p>
+            <div class="heatmap-container">
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <p class="metric-label" style="margin-bottom: 0.5rem;">10 pixels sélectionnés :</p>
+                <div class="feature-tags" id="tags2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div id="phase3" class="phase-content">
+        <h2 class="phase-title"><span class="number">3</span>Wrapper : Sélection Ascendante</h2>
+        <p class="explanation">Forward Selection. On commence avec 0 attribut et on ajoute itérativement l'attribut qui améliore le plus les performances croisées d'un classifieur KNN(k=5).</p>
+        
+<pre><code class="language-python">from sklearn.neighbors import KNeighborsClassifier
+from sklearn.feature_selection import SequentialFeatureSelector
+
+knn = KNeighborsClassifier(n_neighbors=5)
+
+sfs_forward = SequentialFeatureSelector(
+    estimator=knn, n_features_to_select=10, 
+    direction='forward', cv=5
+)
+sfs_forward.fit(X_train, y_train)
+forward_mask = sfs_forward.get_support()</code></pre>
+
+        <button class="btn-run" onclick="runPhase(3)" id="btn3">
+            ▶ Lancer Forward Selection
+            <div class="spinner" id="spin3"></div>
+        </button>
+        <span class="loading-text" id="load3">Calcul lourd en cours (patientez ~30s)...</span>
+        
+        <div class="alert alert-error" id="err3">Erreur API.</div>
+
+        <div class="result-box" id="res3">
+            <div style="margin-top: 0.5rem;">
+                <p class="metric-label" style="margin-bottom: 0.5rem;">Résultat Forward (10 features) :</p>
+                <div class="feature-tags" id="tags3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div id="phase4" class="phase-content">
+        <h2 class="phase-title"><span class="number">4</span>Wrapper : Sélection Descendante</h2>
+        <p class="explanation">Backward Elimination. On commence avec les 64 attributs et on retire itérativement l'attribut dont l'absence dégrade le moins l'accuracy du KNN.</p>
+        
+        <div class="alert alert-info">
+            Complexité algorithmique : Forward démarre de <code>0</code> et fait <code>n</code> itérations. Backward démarre de <code>64</code> features et doit évaluer (<code>64 × 63 × ... × 54</code>) combinaisons avec validation croisée à chaque étape → <code>O(n²)</code> évaluations contre <code>O(n)</code> pour Forward.
+        </div>
+        
+<pre><code class="language-python">sfs_backward = SequentialFeatureSelector(
+    estimator=knn, n_features_to_select=10, 
+    direction='backward', cv=5
+)
+sfs_backward.fit(X_train, y_train)
+backward_mask = sfs_backward.get_support()</code></pre>
+
+        <button class="btn-run" onclick="runPhase(4)" id="btn4">
+            ▶ Lancer Backward Elimination
+            <div class="spinner" id="spin4"></div>
+        </button>
+        <span class="loading-text" id="load4">Calcul très lourd en cours (patientez > 1 min)...</span>
+
+        <div class="alert alert-error" id="err4">Erreur API.</div>
+
+        <div class="result-box" id="res4">
+            <div style="margin-top: 0.5rem;">
+                <p class="metric-label" style="margin-bottom: 0.5rem;">Résultat Backward (10 features) :</p>
+                <div class="feature-tags" id="tags4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div id="phase5" class="phase-content">
+        <h2 class="phase-title"><span class="number">5</span>Comparaison Finale des Performances</h2>
+        <p class="explanation">Validation des approches en entraînant un KNN final sur X_train réduit et test sur X_test réduit. Comparaison avec la baseline à 64 attributs.</p>
+        
+<pre><code class="language-python">def eval_subset(mask):
+    clf = KNeighborsClassifier(n_neighbors=5)
+    clf.fit(X_train[:, mask], y_train)
+    return clf.score(X_test[:, mask], y_test)
+
+acc_baseline = eval_subset(np.ones(64, dtype=bool))
+acc_filter = eval_subset(filter_mask)
+acc_forward = eval_subset(forward_mask)
+acc_backward = eval_subset(backward_mask)</code></pre>
+
+        <button class="btn-run" onclick="runPhase(5)" id="btn5">
+            ▶ Lancer la comparaison finale
+            <div class="spinner" id="spin5"></div>
+        </button>
+        <span class="loading-text" id="load5">Évaluation sur le jeu de test...</span>
+
+        <div class="alert alert-error" id="err5">Erreur API. Vérifiez que les phases 2, 3 et 4 sont bien calculées.</div>
+
+        <div class="result-box" id="res5">
+            <h3>Tableau de bord Comparatif (Jeu de test)</h3>
+            
+            <div class="chart-bar-container" style="margin-top: 1.5rem;">
+                <div class="chart-row">
+                    <div class="chart-label">Baseline (64 func)</div>
+                    <div class="chart-bar-out"><div class="chart-bar-in" id="bar_base" data-width="0">0%</div></div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-label">Filter ANOVA (10)</div>
+                    <div class="chart-bar-out"><div class="chart-bar-in" id="bar_filter" data-width="0">0%</div></div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-label">SFS Forward (10)</div>
+                    <div class="chart-bar-out"><div class="chart-bar-in success" id="bar_forward" data-width="0">0%</div></div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-label">SFS Backward (10)</div>
+                    <div class="chart-bar-out"><div class="chart-bar-in success" id="bar_backward" data-width="0">0%</div></div>
+                </div>
+            </div>
+
+            <table class="summary-table" id="summaryTable">
+                <thead>
+                    <tr><th>Méthode</th><th>Nb Features</th><th>Accuracy</th><th>Réduction</th><th>Temps réel</th></tr>
+                </thead>
+                <tbody>
+                    <tr id="row_base"><td style="font-family: 'Inter', sans-serif;">Baseline (KNN)</td><td>64</td><td id="td_acc_base">-</td><td>0%</td><td id="td_t_base">-</td></tr>
+                    <tr id="row_filter"><td style="font-family: 'Inter', sans-serif;">Filter ANOVA</td><td>10</td><td id="td_acc_filter">-</td><td>84%</td><td id="td_t_filter">-</td></tr>
+                    <tr id="row_forward"><td style="font-family: 'Inter', sans-serif;">SFS Forward</td><td>10</td><td id="td_acc_forward">-</td><td>84%</td><td id="td_t_forward">-</td></tr>
+                    <tr id="row_backward"><td style="font-family: 'Inter', sans-serif;">SFS Backward</td><td>10</td><td id="td_acc_backward">-</td><td>84%</td><td id="td_t_backward">-</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        Module : Analyse et Sécurité des Données Multimédia | Master IAOC
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.querySelectorAll('pre code').forEach((el) => { hljs.highlightElement(el); });
+        
+        // Lancement automatique de toutes les phases (séquentiel pour ne pas surcharger le backend)
+        await runPhase(1);
+        await runPhase(2);
+        await runPhase(3);
+        await runPhase(4);
+        await runPhase(5);
+    });
+
+    function showPhase(phaseNum) {
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            if(idx === phaseNum - 1) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        document.querySelectorAll('.phase-content').forEach(content => { content.classList.remove('active'); });
+        document.getElementById('phase' + phaseNum).classList.add('active');
+        
+        const progressPercent = (phaseNum / 5) * 100;
+        document.getElementById('progressBar').style.width = progressPercent + '%';
+        document.getElementById('progressText').innerText = `Phase ${phaseNum} / 5`;
+    }
+
+    async function runPhase(phase) {
+        const btn = document.getElementById(`btn${phase}`);
+        const spin = document.getElementById(`spin${phase}`);
+        const load = document.getElementById(`load${phase}`);
+        const err = document.getElementById(`err${phase}`);
+        const res = document.getElementById(`res${phase}`);
+        
+        btn.disabled = true;
+        spin.style.display = 'inline-block';
+        load.style.display = 'inline';
+        err.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/api/phase${phase}`);
+            if (!response.ok) throw new Error('Erreur API');
+            const data = await response.json();
+            
+            // Traitement spécifique
+            if(phase === 1) {
+                document.getElementById('val_samples').innerText = data.n_samples;
+                document.getElementById('val_features').innerText = data.n_features;
+                document.getElementById('val_train').innerText = `(${data.train_shape[0]}, ${data.train_shape[1]})`;
+            }
+            if(phase === 2) {
+                renderHeatmap(data.f_scores);
+                renderTags('tags2', data.feature_names);
+            }
+            if(phase === 3) { renderTags('tags3', data.feature_names); }
+            if(phase === 4) { renderTags('tags4', data.feature_names); }
+            if(phase === 5) {
+                updateComparison(data);
+            }
+            
+            res.classList.add('visible');
+        } catch (error) {
+            err.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            spin.style.display = 'none';
+            load.style.display = 'none';
+        }
+    }
+
+    function renderTags(elementId, names) {
+        const container = document.getElementById(elementId);
+        container.innerHTML = '';
+        names.forEach(name => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.innerText = name;
+            container.appendChild(span);
+        });
+    }
+
+    function renderHeatmap(scores) {
+        const grid = document.getElementById('heatmapGrid');
+        grid.innerHTML = '';
+        let maxScore = Math.max(...scores.filter(i => !isNaN(i) && i !== Infinity));
+        if (!maxScore || maxScore <= 0) maxScore = 1;
+        
+        for (let i = 0; i < 64; i++) {
+            let score = scores[i] || 0;
+            const intensity = Math.min(1, score / maxScore);
+            
+            let color;
+            if (intensity < 0.1) color = '#1e2532';
+            else if (intensity < 0.4) color = `rgba(124, 58, 237, ${intensity * 1.5})`;
+            else color = `rgba(0, 200, 150, ${intensity})`;
+
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.style.backgroundColor = color;
+            cell.setAttribute('data-score', `Pixel ${i} (F: ${Math.round(score)})`);
+            grid.appendChild(cell);
+        }
+    }
+
+    function updateComparison(data) {
+        // Barres
+        const animateBar = (id, val) => {
+            const bar = document.getElementById(id);
+            bar.style.width = val.toFixed(1) + '%';
+            bar.innerText = val.toFixed(1) + '%';
+        };
+        animateBar('bar_base', data.baseline.accuracy);
+        animateBar('bar_filter', data.filter.accuracy);
+        animateBar('bar_forward', data.forward.accuracy);
+        animateBar('bar_backward', data.backward.accuracy);
+        
+        // Tableau
+        document.getElementById('td_acc_base').innerText = data.baseline.accuracy.toFixed(2) + '%';
+        document.getElementById('td_acc_filter').innerText = data.filter.accuracy.toFixed(2) + '%';
+        document.getElementById('td_acc_forward').innerText = data.forward.accuracy.toFixed(2) + '%';
+        document.getElementById('td_acc_backward').innerText = data.backward.accuracy.toFixed(2) + '%';
+        
+        document.getElementById('td_t_base').innerText = data.baseline.time_sec.toFixed(2) + 's';
+        document.getElementById('td_t_filter').innerText = data.filter.time_sec.toFixed(2) + 's';
+        document.getElementById('td_t_forward').innerText = data.forward.time_sec.toFixed(2) + 's';
+        document.getElementById('td_t_backward').innerText = data.backward.time_sec.toFixed(2) + 's';
+
+        // Trouver le meilleur
+        const rows = [
+            { id: 'row_base', val: data.baseline.accuracy },
+            { id: 'row_filter', val: data.filter.accuracy },
+            { id: 'row_forward', val: data.forward.accuracy },
+            { id: 'row_backward', val: data.backward.accuracy }
+        ];
+        
+        let best = rows[0];
+        rows.forEach(r => { 
+            document.getElementById(r.id).classList.remove('best-result');
+            const exBadge = document.getElementById(r.id).querySelector('.badge-best');
+            if(exBadge) exBadge.remove();
+            
+            if(r.val > best.val) best = r; 
+        });
+        
+        const bestRow = document.getElementById(best.id);
+        bestRow.classList.add('best-result');
+        bestRow.cells[0].innerHTML += ' <span class="badge-best">Meilleur</span>';
+    }
+</script>
+
+</body>
+</html>

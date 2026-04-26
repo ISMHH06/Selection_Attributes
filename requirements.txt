@@ -1,0 +1,12 @@
+# INSTRUCTIONS :
+# 1) python3 -m venv .venv
+# 2) source .venv/bin/activate  (ou .venv\Scripts\activate sur Windows)
+# 3) pip install -r requirements.txt
+# 4) python app.py
+# 5) Ouvrir http://127.0.0.1:8000
+
+fastapi==0.115.0
+uvicorn==0.30.6
+numpy>=1.26
+scikit-learn>=1.5
+pydantic>=2.0
